@@ -6,12 +6,18 @@ on:
       - main
   workflow_dispatch:
 
+env:
+  AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+  AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
 jobs:
   terraform:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        environment: [dev, test, prod]  # Kjører jobben for hvert miljø
+        environment: [dev, test, prod]
 
     steps:
       - name: Checkout repository
@@ -20,29 +26,30 @@ jobs:
       - name: Azure Login
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          creds: |
+            {
+              "clientId": "${{ secrets.AZURE_CLIENT_ID }}",
+              "clientSecret": "${{ secrets.AZURE_CLIENT_SECRET }}",
+              "tenantId": "${{ secrets.AZURE_TENANT_ID }}",
+              "subscriptionId": "${{ secrets.AZURE_SUBSCRIPTION_ID }}"
+            }
 
       - name: Set Terraform workspace
         run: |
-          cd terraform
+          cd environments/${{ matrix.environment }}
           terraform workspace select ${{ matrix.environment }} || terraform workspace new ${{ matrix.environment }}
 
       - name: Terraform Init
         run: |
-          cd terraform
-          terraform init \
-            -backend-config="resource_group_name=rg-terraform-backend-${{ matrix.environment }}" \
-            -backend-config="storage_account_name=timdemoft2025h25liamx25" \
-            -backend-config="container_name=tfstateliamx25" \
-            -backend-config="key=storage/${{ matrix.environment }}/terraform.tfstate" \
-            -reconfigure
+          cd environments/${{ matrix.environment }}
+          terraform init -backend-config="environment=${{ matrix.environment }}"
 
       - name: Terraform Plan
         run: |
-          cd terraform
+          cd environments/${{ matrix.environment }}
           terraform plan -var="environment=${{ matrix.environment }}"
 
       - name: Terraform Apply
         run: |
-          cd terraform
+          cd environments/${{ matrix.environment }}
           terraform apply -auto-approve -var="environment=${{ matrix.environment }}"
