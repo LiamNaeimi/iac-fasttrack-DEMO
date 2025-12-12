@@ -1,0 +1,7 @@
+location                         = "northeurope"
+resource_group_name              = "rg-timdemotf-dev"
+storage_account_name             = "timdemoftdev2025dsa"
+storage_account_tier             = "Standard"
+storage_account_replication_type = "LRS"
+container_name                   = "appdata-dev"
+environment                      = "dev"
