@@ -1,0 +1,42 @@
+name: Terraform Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+  AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment: [dev, test, prod] 
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Login to Azure
+        run: |
+          az login --service-principal \
+            -u $AZURE_CLIENT_ID \
+            -p $AZURE_CLIENT_SECRET \
+            --tenant $AZURE_TENANT_ID
+
+      - name: Set Terraform workspace
+        run: |
+          terraform workspace select ${{ matrix.environment }} || terraform workspace new ${{ matrix.environment }}
+
+      - name: Terraform Init
+        run: terraform init -backend-config="environment=${{ matrix.environment }}"
+
+      - name: Terraform Plan
+        run: terraform plan -var="environment=${{ matrix.environment }}"
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve -var="environment=${{ matrix.environment }}"
