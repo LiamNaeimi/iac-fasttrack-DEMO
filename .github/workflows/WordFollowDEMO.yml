@@ -6,11 +6,6 @@ on:
       - main
   workflow_dispatch:
 
-env:
-  AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-  AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-  AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-
 jobs:
   terraform:
     runs-on: ubuntu-latest
@@ -23,29 +18,31 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Azure Login
-        run: |
-          az login --service-principal \
-            -u $AZURE_CLIENT_ID \
-            -p $AZURE_CLIENT_SECRET \
-            --tenant $AZURE_TENANT_ID
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Set Terraform workspace
         run: |
-          cd environments/${{ matrix.environment }}
+          cd terraform
           terraform workspace select ${{ matrix.environment }} || terraform workspace new ${{ matrix.environment }}
 
       - name: Terraform Init
         run: |
-          cd environments/${{ matrix.environment }}
-          terraform init -backend-config="environment=${{ matrix.environment }}"
+          cd terraform
+          terraform init \
+            -backend-config="resource_group_name=rg-terraform-backend-${{ matrix.environment }}" \
+            -backend-config="storage_account_name=timdemoft2025h25liamx25" \
+            -backend-config="container_name=tfstateliamx25" \
+            -backend-config="key=storage/${{ matrix.environment }}/terraform.tfstate" \
+            -reconfigure
 
       - name: Terraform Plan
         run: |
-          cd environments/${{ matrix.environment }}
+          cd terraform
           terraform plan -var="environment=${{ matrix.environment }}"
 
       - name: Terraform Apply
         run: |
-          cd environments/${{ matrix.environment }}
+          cd terraform
           terraform apply -auto-approve -var="environment=${{ matrix.environment }}"
-
