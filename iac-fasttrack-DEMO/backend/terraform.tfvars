@@ -1,16 +1,16 @@
 # Resource Group
-resource_group_name = "rg-terraform-backend-timdemoft"
+resource_group_name = "rg-terraform-backend-liamx25"
 location            = "norwayeast"
 
 # Storage Account (må være globalt unikt - bruk ditt eget navn)
-storage_account_name = "timdemoft2025h25"
+storage_account_name = "timdemoft2025h25liamx25"
 
 # Container for Terraform state
-container_name = "tfstate"
+container_name = "tfstateliamx25"
 
 # Key Vault (må være globalt unikt - skriv inn eget navn)
-key_vault_name = "kv-timdemotf-123rsf"
+key_vault_name = "kv-liamx25-123rsf"
 
 # Azure AD / EntraID informasjon
-service_principal_object_id = "a464ed7e-382f-4f47-b240-1c1dfe9b39ff"
-user_object_id              = "3a0d3621-033b-42a4-a413-69c73af591b2"
+service_principal_object_id = "1216a7b6-9b6a-4b2a-b540-8285d445053b"
+user_object_id              = "5a5b83d3-e82f-4530-9c36-d1067cd60477"

@@ -1,6 +1,6 @@
 location                         = "northeurope"
-resource_group_name              = "rg-timdemotf-test"
-storage_account_name             = "timdemofttest2025dsa"
+resource_group_name              = "rg-terraform-backend-liamx25test"
+storage_account_name             = "timdemoft2025h25liamx25test"
 storage_account_tier             = "Standard"
 storage_account_replication_type = "LRS"
 container_name                   = "appdata-test"

@@ -10,16 +10,18 @@ terraform {
 }
 
 provider "azurerm" {
-  features {
-
-    resource_group {
-      prevent_deletion_if_contains_resources = false
-    }
-  }
-  use_cli                         = true # Bruker pålogging via `az login`
-  resource_provider_registrations = "none"
+  features {}
+  use_cli = true               # Bruker Azure CLI-login
+  subscription_id = "7a3c6854-0fe1-42eb-b5b9-800af1e53d70"
+}
+data "azurerm_client_config" "current" {}
+output "current_user" {
+  value = data.azurerm_client_config.current.object_id
 }
 
+output "current_subscription" {
+  value = data.azurerm_client_config.current.subscription_id
+}
 # Resource Group
 resource "azurerm_resource_group" "main" {
   name     = var.resource_group_name
@@ -28,7 +30,7 @@ resource "azurerm_resource_group" "main" {
 }
 
 # Hent innlogget bruker fra Entra ID
-data "azurerm_client_config" "current" {}
+
 
 
 # Storage Account for Terraform backend

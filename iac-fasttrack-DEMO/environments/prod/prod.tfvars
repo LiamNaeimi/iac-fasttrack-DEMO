@@ -1,6 +1,6 @@
 location                         = "northeurope"
-resource_group_name              = "rg-timdemotf-prod"
-storage_account_name             = "timdemoftprod2025dsa"
+resource_group_name              = "rg-terraform-backend-liamx25prod"
+storage_account_name             = "timdemoft2025h25liamx25prod"
 storage_account_tier             = "Standard"
 storage_account_replication_type = "GRS"
 container_name                   = "appdata-prod"
