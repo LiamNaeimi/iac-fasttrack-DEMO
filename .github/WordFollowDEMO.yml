@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 env:
   AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
@@ -15,13 +16,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        environment: [dev, test, prod] 
+        environment: [dev, test, prod]  # Kjører jobben for hvert miljø
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Login to Azure
+      - name: Azure Login
         run: |
           az login --service-principal \
             -u $AZURE_CLIENT_ID \
@@ -30,13 +31,21 @@ jobs:
 
       - name: Set Terraform workspace
         run: |
+          cd environments/${{ matrix.environment }}
           terraform workspace select ${{ matrix.environment }} || terraform workspace new ${{ matrix.environment }}
 
       - name: Terraform Init
-        run: terraform init -backend-config="environment=${{ matrix.environment }}"
+        run: |
+          cd environments/${{ matrix.environment }}
+          terraform init -backend-config="environment=${{ matrix.environment }}"
 
       - name: Terraform Plan
-        run: terraform plan -var="environment=${{ matrix.environment }}"
+        run: |
+          cd environments/${{ matrix.environment }}
+          terraform plan -var="environment=${{ matrix.environment }}"
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve -var="environment=${{ matrix.environment }}"
+        run: |
+          cd environments/${{ matrix.environment }}
+          terraform apply -auto-approve -var="environment=${{ matrix.environment }}"
+
